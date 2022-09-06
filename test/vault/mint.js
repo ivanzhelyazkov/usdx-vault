@@ -89,6 +89,16 @@ describe('Contract: Vault', async () => {
       balance = await dai.balanceOf(admin.address);
       await expect(vault.mint(dai.address, balance.add(1))).
         to.be.revertedWith('Not enough balance to mint');
+    }),
+
+    it('shouldn\'t be able to mint if vault is paused', async () => {
+      await vault.pause();
+      let isPaused = await vault.paused();
+      expect(isPaused).to.be.eq(true);
+      await expect(vault.mint(tusd.address, bnDecimal(1000))).
+        to.be.revertedWith('Pausable: paused')
+      await expect(vault.mintWithUSDT(bnDecimal(1000))).
+        to.be.revertedWith('Pausable: paused')
     })
   })
 })

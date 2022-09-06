@@ -224,4 +224,21 @@ contract Vault is Ownable, Pausable, ReentrancyGuard {
             emit AssetDelisted(_asset);
         }
     }
+
+    /**
+     * @notice Pauses mint and redeem functions
+     */
+    function pause() external onlyOwner returns (bool) {
+        _pause();
+        return true;
+    }
+
+
+    /**
+     * @notice Unpauses mint and redeem functions
+     */
+    function unpause() external onlyOwner returns (bool) {
+        _unpause();
+        return true;
+    }
 }

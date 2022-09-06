@@ -141,6 +141,20 @@ describe('Contract: Vault', async () => {
       let usdxBalance = await usdx.balanceOf(user1.address);
       await expect(vault.connect(user1).redeemForAsset(dai.address, usdxBalance)).
         to.be.revertedWith('User doesn\'t have enough invested in the asset')
+    }),
+
+    it('shouldn\'t be able to redeem if vault is paused', async () => {
+      await vault.connect(user1).mintWithUSDT(bnDecimal(1000));
+      await vault.connect(user1).mint(usdc.address, bnDecimal(1000));
+
+      await vault.pause();
+      let isPaused = await vault.paused();
+      expect(isPaused).to.be.eq(true);
+
+      await expect(vault.redeemForAsset(tusd.address, bnDecimal(1000))).
+        to.be.revertedWith('Pausable: paused')
+      await expect(vault.redeem(bnDecimal(1000))).
+        to.be.revertedWith('Pausable: paused')
     })
   })
 })

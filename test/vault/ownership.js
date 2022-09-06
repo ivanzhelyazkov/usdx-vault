@@ -26,6 +26,23 @@ describe('Contract: Vault', async () => {
       expect(isDAIWhitelisted).to.be.eq(false);
     }),
 
+    it('admin should be able to pause mint and redeem in Vault', async () => {
+      let isPaused = await vault.paused();
+      expect(isPaused).to.be.eq(false);
+      await vault.pause();
+      isPaused = await vault.paused();
+      expect(isPaused).to.be.eq(true);
+    }),
+
+    it('admin should be able to unpause mint and redeem in Vault', async () => {
+      let isPaused = await vault.paused();
+      expect(isPaused).to.be.eq(false);
+      await vault.pause();
+      await vault.unpause();
+      isPaused = await vault.paused();
+      expect(isPaused).to.be.eq(false);
+    }),
+
     it('other users shouln\'t be able to whitelist asset in Vault', async () => {
       await expect(vault.connect(user1).whitelistAsset(dai.address)).
         to.be.revertedWith('Ownable: caller is not the owner');
@@ -37,6 +54,13 @@ describe('Contract: Vault', async () => {
       await expect(vault.connect(user1).delistAsset(dai.address)).
         to.be.revertedWith('Ownable: caller is not the owner');
       await expect(vault.connect(user2).delistAsset(dai.address)).
+        to.be.revertedWith('Ownable: caller is not the owner');
+    })
+
+    it('other users should\'t be able to pause mint and redeem in Vault', async () => {
+      await expect(vault.connect(user1).pause()).
+        to.be.revertedWith('Ownable: caller is not the owner');
+      await expect(vault.connect(user1).unpause()).
         to.be.revertedWith('Ownable: caller is not the owner');
     })
   })
